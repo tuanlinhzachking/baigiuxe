@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bãi Giữ Xe Thông Minh</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            margin-top: 20px;
+        }
+
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(3, 120px);
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .card {
+            width: 100px;
+            height: 100px;
+            background-color: #4CAF50;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .card.red {
+            background-color: #f44336;
+        }
+
+        .button-container {
+            margin-top: 30px;
+        }
+
+        button {
+            width: 100px;
+            height: 40px;
+            margin: 0 10px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #1976D2;
+        }
+
+        .status {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-database.js"></script>
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDHArvdFjob6-QO02gz2W-jWSORJqRQ-lI",
+            authDomain: "baigiuxe-61b92.firebaseapp.com",
+            projectId: "baigiuxe-61b92",
+            storageBucket: "baigiuxe-61b92.firebasestorage.app",
+            messagingSenderId: "126050924589",
+            appId: "1:126050924589:web:12811608e84c5ca32960a4",
+            measurementId: "G-3KE95G63W7"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const cards = document.querySelectorAll('.card');
+            const cardRefs = [
+                firebase.database().ref('TTO1'),
+                firebase.database().ref('TTO2'),
+                firebase.database().ref('TTO3'),
+                firebase.database().ref('TTO4'),
+                firebase.database().ref('TTO5'),
+                firebase.database().ref('TTO6')
+            ];
+
+            const matheRefs = [
+                firebase.database().ref('MATHEO1'),
+                firebase.database().ref('MATHEO2'),
+                firebase.database().ref('MATHEO3'),
+                firebase.database().ref('MATHEO4'),
+                firebase.database().ref('MATHEO5'),
+                firebase.database().ref('MATHEO6')
+            ];
+
+            // Update card color and text based on TTo values
+            cardRefs.forEach((ref, index) => {
+                ref.on('value', function (snapshot) {
+                    const value = snapshot.val();
+                    const card = cards[index];
+
+                    if (value === 0) {
+                        card.classList.add('red');
+                    } else if (value === 1) {
+                        card.classList.remove('red');
+                    }
+                });
+            });
+
+            // Update card text based on MATHE values
+            matheRefs.forEach((ref, index) => {
+                ref.on('value', function (snapshot) {
+                    const value = snapshot.val();
+                    const card = cards[index];
+                    card.textContent = `Mã Thẻ ${value}`;
+                });
+            });
+        });
+
+        function setStatus(status) {
+            const statusElement = document.querySelector('.status');
+            const runRef = firebase.database().ref('RUN');
+
+            if (status === 'start') {
+                statusElement.textContent = 'Hệ thống: Đang sử dụng';
+                runRef.set(1); // Send value 1 to RUN
+            } else if (status === 'stop') {
+                statusElement.textContent = 'Hệ thống: Không sử dụng';
+                runRef.set(0); // Send value 0 to RUN
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>BÃI GIỮ XE THÔNG MINH</h1>
+    <div class="card-container">
+        <div class="card">Mã Thẻ 1</div>
+        <div class="card">Mã Thẻ 2</div>
+        <div class="card">Mã Thẻ 3</div>
+        <div class="card">Mã Thẻ 4</div>
+        <div class="card">Mã Thẻ 5</div>
+        <div class="card">Mã Thẻ 6</div>
+    </div>
+    <div class="button-container">
+        <button onclick="setStatus('start')">START</button>
+        <button onclick="setStatus('stop')">STOP</button>
+    </div>
+    <div class="status">Hệ thống: Đang sử dụng</div>
+</body>
+</html>
